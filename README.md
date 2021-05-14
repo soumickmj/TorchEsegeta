@@ -1,4 +1,6 @@
-TorchEsegeta: Interpretability and Explainability pipeline for PyTorch
+#TorchEsegeta
+
+Interpretability and Explainability pipeline for PyTorch
 
 ### Objective:
 
