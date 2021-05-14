@@ -1,5 +1,4 @@
-#TorchEsegeta
-
+# TorchEsegeta
 Interpretability and Explainability pipeline for PyTorch
 
 ### Objective:
@@ -39,7 +38,7 @@ It is recommended to use conda distribution with python 3.6 environment, Torch 1
 ### Implemented Methods:
 
 >The library is continuously evolving. In first phase we will ensemble methods from other third party libraries. And next we will implement our own methods to augment the capability of this package.
-As of now the implemented methods are
+As of now the implemented methods ar
 
 * Captum
     1. Saliency
