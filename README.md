@@ -123,7 +123,7 @@ Additionally if any sort of zooming required (for non patch based testing), this
 
 > Use Pipeline class or Pipeline multi thread class as per your requirement
 
-#### C) **Configuration FIle**
+#### C) **Configuration File**
 
 > Pass the path for the desired configuration file in pipeline-tester.py. For your help this library contains four sample configuration json files, 
 two for 2d models and rest two for 3d models for both Segmentation and Classification task.
