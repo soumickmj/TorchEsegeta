@@ -199,3 +199,37 @@ DS6 Paper: https://arxiv.org/pdf/2006.10802.pdf
 <a id="6">[6]</a>
 Lime: https://github.com/marcotcr/lime
 
+## Credits
+
+If you like this repository, please click on Star!
+
+If you use any of our approaches in your research or use codes from this repository, please cite one of the following (or both) in your publications:
+
+> [Soumick Chatterjee, Fatima Saad, Chompunuch Sarasaen, Suhita Ghosh, Rupali Khatun, Petia Radeva, Georg Rose, Sebastian Stober, Oliver Speck, Andreas Nürnberger: Exploration of Interpretability Techniques for Deep COVID-19 Classification using Chest X-ray Images (arXiv:2006.02570, June 2020)](https://arxiv.org/abs/2006.02570)
+
+BibTeX entry:
+
+```bibtex
+@article{chatterjee2020exploration,
+  title={Exploration of interpretability techniques for deep covid-19 classification using chest x-ray images},
+  author={Chatterjee, Soumick and Saad, Fatima and Sarasaen, Chompunuch and Ghosh, Suhita and Khatun, Rupali and Radeva, Petia and Rose, Georg and Stober, Sebastian and Speck, Oliver and N{\"u}rnberger, Andreas},
+  journal={arXiv preprint arXiv:2006.02570},
+  year={2020}
+}
+```
+
+> [Soumick Chatterjee, Arnab Das, Chirag Mandal, Budhaditya Mukhopadhyay, Manish Bhandari Vipinraj Bhandari, Aniruddh Shukla, Oliver Speck, Andreas Nürnberger: Interpretability Techniques for Deep Learning based Segmentation Models (ISMRM May 2021)](https://www.researchgate.net/publication/349589153_Interpretability_Techniques_for_Deep_Learning_based_Segmentation_Models)
+
+BibTeX entry:
+
+```bibtex
+@inproceedings{mickISMRM21Esegeta,
+author = {Chatterjee, Soumick and Das, Arnab and Mandal, Chirag and Mukhopadhyay, Budhaditya and Vipinraj Bhandari, Manish Bhandari and Shukla, Aniruddh and Speck, Oliver and Nürnberger, Andreas},
+year = {2021},
+month = {05},
+pages = {2400},
+title = {Interpretability Techniques for Deep Learning based Segmentation Models},
+booktitle={2021 ISMRM \& SMRT Annual Meeting \& Exhibition}
+}
+```
+Thank you so much for your support.
