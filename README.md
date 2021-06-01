@@ -205,6 +205,8 @@ If you like this repository, please click on Star!
 
 If you use any of our approaches in your research or use codes from this repository, please cite one of the following (or both) in your publications:
 
+TorchEsegeta for Classification:-
+
 > [Soumick Chatterjee, Fatima Saad, Chompunuch Sarasaen, Suhita Ghosh, Rupali Khatun, Petia Radeva, Georg Rose, Sebastian Stober, Oliver Speck, Andreas Nürnberger: Exploration of Interpretability Techniques for Deep COVID-19 Classification using Chest X-ray Images (arXiv:2006.02570, June 2020)](https://arxiv.org/abs/2006.02570)
 
 BibTeX entry:
@@ -217,6 +219,8 @@ BibTeX entry:
   year={2020}
 }
 ```
+
+TorchEsegeta for Segmentation:-
 
 > [Soumick Chatterjee, Arnab Das, Chirag Mandal, Budhaditya Mukhopadhyay, Manish Bhandari Vipinraj Bhandari, Aniruddh Shukla, Oliver Speck, Andreas Nürnberger: Interpretability Techniques for Deep Learning based Segmentation Models (ISMRM May 2021)](https://www.researchgate.net/publication/349589153_Interpretability_Techniques_for_Deep_Learning_based_Segmentation_Models)
 
