@@ -1,6 +1,8 @@
 # TorchEsegeta
 Interpretability and Explainability pipeline for PyTorch
 
+Esegeta (origin: ancient Greek) in Italian means interpreter of sacred texts
+
 ### Objective:
 
 > As the use of AI based apps and tools is incresing in critical domains like Medicine, Life support, Manufacturing and as well as in common house holds, its very important now that we strip off the black box nature of the machine learning models. The goal of this development is to create a complete package for testing different inerpretability and explainability methods on any given deep learning model. The package should work for both semantic segmemnation model as well as for classification models.
