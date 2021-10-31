@@ -209,7 +209,7 @@ If you use any of our approaches in your research or use codes from this reposit
 
 TorchEsegeta pipeline, including the methods for Segmentation:-
 
-> [Soumick Chatterjee, Arnab Das, Chirag Mandal, Budhaditya Mukhopadhyay, Manish Vipinraj, Aniruddh Shukla, Rajatha Nagaraja Rao, Chompunuch Sarasaen, Oliver Speck, Andreas Nürnberger: TorchEsegeta: Framework for Interpretability and Explainability of Image-based Deep Learning Models (arXiv preprint 2110.08429)](https://arxiv.org/abs/2110.08429)
+> [Soumick Chatterjee, Arnab Das, Chirag Mandal, Budhaditya Mukhopadhyay, Manish Vipinraj, Aniruddh Shukla, Rajatha Nagaraja Rao, Chompunuch Sarasaen, Oliver Speck, Andreas Nürnberger: TorchEsegeta: Framework for Interpretability and Explainability of Image-based Deep Learning Models (arXiv:2110.08429, Oct 2021)](https://arxiv.org/abs/2110.08429)
 
 BibTeX entry:
 
