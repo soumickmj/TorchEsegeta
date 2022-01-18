@@ -69,95 +69,149 @@ def MethodsSelector():
     sg.theme('Default1')
     sg.SetOptions(text_justification='right')
 
-    Captum = [[sg.Checkbox('Saliency', size=(20, 1)),
-               sg.Checkbox('Feature Ablation', size=(20, 1)),
-               sg.Checkbox('IG', size=(20, 1)),
-               sg.Checkbox('Occlusion', size=(20, 1)),
-               sg.Checkbox('layer_conductance', size=(20, 1)), ],
+    l = 30
+    feature_based = [
+        [
+            sg.Checkbox('Shapley Value Sampling [captum]', size=(l, 1)),
+            sg.Checkbox('Feature Ablation [captum]', size=(l, 1)),
+            sg.Checkbox('Occlusion [captum]', size=(l, 1)),
+            sg.Checkbox('Score cam [CNN Vis]', size=(l, 1)),
+        ],
+    ]
+    gradient_based = [
+        [
 
-              [sg.Checkbox('GBP', size=(20, 1)),
-               sg.Checkbox('Deep Lift', size=(20, 1)),
-               sg.Checkbox('Deconv', size=(20, 1)),
-               sg.Checkbox('Guided GradCam', size=(20, 1)),
-               sg.Checkbox('gradient_shap', size=(20, 1)),
-               ],
-              [
-                  sg.Checkbox('Layer Act', size=(20, 1)),
-                  sg.Checkbox('internal_influence', size=(20, 1)),
-                  sg.Checkbox('layer_grad_shap', size=(20, 1)),
-                  sg.Checkbox('input_x_gradient', size=(20, 1)),
-                  sg.Checkbox('ShapleyValueSampling', size=(20, 1)),
-              ],
-              [
-                  sg.Checkbox('deep_lift_shap', size=(20, 1)),
-                  sg.Checkbox('LayerGradCam', size=(20, 1)),
-                  sg.Checkbox('LayerGradientXActivation', size=(20, 1)),
-                  sg.Checkbox('LayerDeepLift', size=(20, 1)), ], ]
+            sg.Checkbox('Guided Backprop [CNN Vis]', size=(l, 1)),
+            sg.Checkbox('Guided Backprop [captum]', size=(l, 1)),
+            sg.Checkbox('Guided Backprop  [torchray]', size=(l, 1)),
+            sg.Checkbox('Saliency [captum]', size=(l, 1)),
 
-    Other = [[sg.Checkbox('lucent_render_vis', size=(20, 1)),
-              sg.Checkbox('lime_segmentation', size=(20, 1)), ]]
+        ],
+        [
+            sg.Checkbox('Input x gradient [captum]', size=(l, 1)),
+            sg.Checkbox('Integrated Grad [CNN Vis]', size=(l, 1)),
+            sg.Checkbox('Deconvolution [captum]', size=(l, 1)),
+            sg.Checkbox('Deconvolution [torchray]', size=(l, 1)),
+        ],
+        [
+            sg.Checkbox('Grad times image [CNN Vis]', size=(l, 1)),
+            sg.Checkbox('Deep Lift [captum]', size=(l, 1)),
+            sg.Checkbox('Deep Lift Shap [captum]', size=(l, 1)),
+            sg.Checkbox('Integrated Gradients [captum]', size=(l, 1)),
+        ],
+        [
+            sg.Checkbox('Gradient Shap [captum]', size=(l, 1)),
+            sg.Checkbox('Guided Grad Cam [captum]', size=(l, 1)),
+            sg.Checkbox('Guided Grad Cam [CNN Vis]', size=(l, 1)),
+            sg.Checkbox('Vanilla Backprop [CNN Vis]', size=(l, 1)),
+        ],
+        [
+            sg.Checkbox('Layer Visualization [CNN Vis]', size=(l, 1)),
+        ]
+    ]
 
-    CNN = [[sg.Checkbox('score_cam', size=(20, 1)),
-            sg.Checkbox('vanilla_backprop', size=(20, 1)),
-            sg.Checkbox('layer_activation_GBP', size=(20, 1)),
-            sg.Checkbox('grad_cam', size=(20, 1)),
-            sg.Checkbox('layer_visualization', size=(20, 1)), ],
+    Interpretability_Model_Attribution = [
+        [sg.Frame('Feature Based', feature_based, font='Any 12', title_color='black')],
+        [sg.Frame('Gradient Based', gradient_based, font='Any 12', title_color='black')]
 
-           [sg.Checkbox('grad_times_image', size=(20, 1)),
-            sg.Checkbox('DeepDream', size=(20, 1)),
-            sg.Checkbox('GBP', size=(20, 1)),
-            sg.Checkbox('IG', size=(20, 1)),
-            sg.Checkbox('GGCam', size=(20, 1)), ]
-           ]
+    ]
 
-    Torchray = [[sg.Checkbox('Deconv', size=(20, 1)),
-                 sg.Checkbox('Gradcam', size=(20, 1)),
-                 sg.Checkbox('Gradient', size=(20, 1)),
-                 sg.Checkbox('Excitation Backprop', size=(20, 1)), ],
-                [sg.Checkbox('Guidedbackprop', size=(20, 1)),
-                 sg.Checkbox('Contrast Exct Bacp', size=(20, 1)),
-                 sg.Checkbox('Linear Approximation', size=(20, 1))]]
+    Interpretability_Layer_Attribution = [
+        [
+            sg.Checkbox('Layer Conductance [captum]', size=(l, 1)),
+            sg.Checkbox('Layer Activation [captum]', size=(l, 1)),
+            sg.Checkbox('Internal Influence [captum]', size=(l, 1)),
+            sg.Checkbox('Layer Grad Shap [captum]', size=(l, 1)),
 
-    layout = [[sg.Frame('Captum', Captum, font='Any 12', title_color='black')],
-              [sg.Frame('CNN', CNN, font='Any 12', title_color='black')],
-              [sg.Frame('Torchray', Torchray, font='Any 12', title_color='black')],
-              [sg.Frame('Other', Other, font='Any 12', title_color='black')],
-              [sg.Submit(size=(15, 1), button_text="Update Fields"), sg.Cancel(size=(15, 1))]]
+        ],
+        [
+            sg.Checkbox('Layer DeepLift [captum]', size=(l, 1)),
+            sg.Checkbox('Layer Activation GBP[CNN Vis]', size=(l, 1)),
+            sg.Checkbox('Layer GradCam [captum]', size=(l, 1)),
+            sg.Checkbox('Grad Cam [CNN Vis]', size=(l, 1)),
+        ],
+        [
+            sg.Checkbox('LayerGradientXActivation [captum]', size=(l, 1)),
+            sg.Checkbox('Grad Cam [torchray]', size=(l, 1)),
+            sg.Checkbox('Gradient [torchray]', size=(l, 1)),
+            sg.Checkbox('Contrast Excitation Backprop [torchray]', size=(l, 1)),
 
-    methods = ['Saliency', 'Feature_Ablation', 'Integrated_Gradients', 'Occlusion', 'layer_conductance',
-               'Guided_Backprop', 'Deep_Lift',
-               'Deconvolution', 'Guided_Grad_Cam', 'gradient_shap', 'Layer_Activation', 'internal_influence',
-               'layer_grad_shap',
-               'input_x_gradient', 'ShapleyValueSampling', 'deep_lift_shap', 'LayerGradCam', 'LayerGradientXActivation',
-               'LayerDeepLift', 'score_cam', 'vanilla_backprop', 'layer_activation_guided_backprop', 'grad_cam',
-               'layer_visualization',
-               'grad_times_image', 'DeepDream', 'guided_backprop', 'integrated_grad', 'guided_grad_cam', 'Deconv',
-               'Gradcam', 'Gradient',
-               'contrast_excitation_backprop', 'Guidedbackprop', 'contrast_excitation_backprop', 'Linearapprox',
-               'lucent_render_vis', 'segmentation']
-    window = sg.Window('Torch Esgeta - Methods selector', font=("Helvetica", 12)).Layout(layout)
+        ],
+        [
+            sg.Checkbox('Contrast Excitation Backprop [torchray]', size=(l, 1)),
+            sg.Checkbox('Linear Approx [torchray]', size=(l, 1)),
+        ]
+    ]
+
+    Explainability = [
+        [
+            sg.Checkbox('Render Visualization [lucent]', size=(l, 1)),
+            sg.Checkbox('Segmentation [lime]', size=(l, 1)),
+            sg.Checkbox('DeepDream [CNN Vis]', size=(l, 1)),
+
+        ],
+    ]
+
+    layout = [
+        [sg.Frame('Interpretability : Model Attribution', Interpretability_Model_Attribution, font='Any 12', title_color='black',)],
+        [sg.Frame('Interpretability : Layer Attribution', Interpretability_Layer_Attribution, font='Any 12', title_color='black')],
+        [sg.Frame('Explainability', Explainability, font='Any 12', title_color='black')],
+        [sg.Submit(size=(20, 1), button_text="Update Fields"), sg.Cancel(size=(20, 1))]
+    ]
+
+    window = sg.Window('Torch Esgeta - Methods selector', font=("Helvetica", 12), resizable=True,
+                       auto_size_text=True, auto_size_buttons=True).Layout(layout)
+
     button, values = window.Read()
     sg.SetOptions(text_justification='left')
     if disp:
         print(button, values)
+    methods = [
+        'ShapleyValueSampling_captum',
+        'Feature_Ablation_captum',
+        'Occlusion_captum',
+        'score_cam_CNN Visualization',
+        'guided_backprop_CNN Visualization',
+        'Guided_Backprop_captum',
+        'Guidedbackprop_torchray',
+        'Saliency_captum',
+        'input_x_gradient_captum',
+        'integrated_grad_CNN Visualization',
+        'Deconvolution_captum',
+        'Deconv_torchray',
+        'grad_times_image_CNN Visualization',
+        'Deep_Lift_captum',
+        'deep_lift_shap_captum',
+        'Integrated_Gradients_captum',
+        'gradient_shap_captum',
+        'Guided_Grad_Cam_captum',
+        'guided_grad_cam_CNN Visualization',
+        'vanilla_backprop_CNN Visualization',
+        'layer_visualization_CNN Visualization',
+        'layer_conductance_captum',
+        'Layer_Activation_captum',
+        'internal_influence_captum',
+        'layer_grad_shap_captum',
+        'LayerDeepLift_captum',
+        'layer_activation_guided_backprop_CNN Visualization',
+        'LayerGradCam_captum',
+        'grad_cam_CNN Visualization',
+        'LayerGradientXActivation_captum',
+        'Gradcam_torchray',
+        'Gradient_torchray',
+        'contrast_excitation_backprop_torchray',
+        'contrast_excitation_backprop_torchray',
+        'Linearapprox_torchray',
+        'lucent_render_vis_lucent',
+        'segmentation_lime',
+        'DeepDream_CNN Visualization'
+    ]
     method_names = []
     for i in values:
         if values[i]:
-            if 0 <= i <= 18:
-                # print(methods[i] + "_captum")
-                method_names.append(methods[i] + "_captum")
-            elif 19 <= i <= 28:
-                # print(methods[i] + "_CNN Visualization")
-                method_names.append(methods[i] + "_CNN Visualization")
-            elif 29 <= i <= 35:
-                # print(methods[i] + "_torchray")
-                method_names.append(methods[i] + "_torchray")
-            elif i == 36:
-                # print(methods[i] + "_lucent")
-                method_names.append(methods[i] + "_lucent")
-            elif i == 37:
-                # print(methods[i] + "_lime")
-                method_names.append(methods[i] + "_lime")
+            method_names.append(methods[i])
+
+    print(method_names)
     return method_names
 
 
@@ -282,5 +336,5 @@ def main(JsonFilePath):
 
 
 if __name__ == "__main__":
-    jsonFilePath = "C:/Users/budha/PycharmProjects/Esgeta_GUI/jsons/TorchEsegeta_cfg_Misc_Seg_3d.json"
+    jsonFilePath = "TorchEsegeta_cfg_Misc_Seg_3d.json"
     main(jsonFilePath)
