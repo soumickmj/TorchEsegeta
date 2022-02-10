@@ -211,19 +211,25 @@ If you use any of our approaches in your research or use codes from this reposit
 
 TorchEsegeta pipeline, including the methods for Segmentation:-
 
-> [Soumick Chatterjee, Arnab Das, Chirag Mandal, Budhaditya Mukhopadhyay, Manish Vipinraj, Aniruddh Shukla, Rajatha Nagaraja Rao, Chompunuch Sarasaen, Oliver Speck, Andreas Nürnberger: TorchEsegeta: Framework for Interpretability and Explainability of Image-based Deep Learning Models (arXiv:2110.08429, Oct 2021)](https://arxiv.org/abs/2110.08429)
+> [Soumick Chatterjee, Arnab Das, Chirag Mandal, Budhaditya Mukhopadhyay, Manish Vipinraj, Aniruddh Shukla, Rajatha Nagaraja Rao, Chompunuch Sarasaen, Oliver Speck, Andreas Nürnberger: TorchEsegeta: Framework for Interpretability and Explainability of Image-based Deep Learning Models (Preprint:- arXiv:2110.08429, Oct 2021, Published:- Applied Sciences, Feb 2022)](https://www.mdpi.com/2076-3417/12/4/1834)
 
 BibTeX entry:
 
 ```bibtex
-@article{chatterjee2021torchesegeta,
-  title={TorchEsegeta: Framework for Interpretability and Explainability of Image-based Deep Learning Models},
-  author={Chatterjee, Soumick and Das, Arnab and Mandal, Chirag and Mukhopadhyay, Budhaditya and Vipinraj, Manish and Shukla, Aniruddh and Rao, Rajatha Nagaraja and Sarasaen, Chompunuch and Speck, Oliver and N{\"u}rnberger, Andreas},
-  journal={arXiv preprint arXiv:2110.08429},
-  eprint={2110.08429},
-  archivePrefix = {arXiv},
-  year="2021"
+@article{chatterjee2022torchesegeta,
+  author = {Chatterjee, Soumick and Das, Arnab and Mandal, Chirag and Mukhopadhyay, Budhaditya and Vipinraj, Manish and Shukla, Aniruddh and Nagaraja Rao, Rajatha and Sarasaen, Chompunuch and Speck, Oliver and Nürnberger, Andreas},
+title = {TorchEsegeta: Framework for Interpretability and Explainability of Image-Based Deep Learning Models},
+journal = {Applied Sciences},
+volume = {12},
+year = {2022},
+number = {4},
+article-number = {1834},
+url = {https://www.mdpi.com/2076-3417/12/4/1834},
+issn = {2076-3417},
+doi = {10.3390/app12041834}
 }
+
+
 ```
 This was also presented as an abstract at ISMRM 2021:
 > [Soumick Chatterjee, Arnab Das, Chirag Mandal, Budhaditya Mukhopadhyay, Manish Bhandari Vipinraj Bhandari, Aniruddh Shukla, Oliver Speck, Andreas Nürnberger: Interpretability Techniques for Deep Learning based Segmentation Models (ISMRM May 2021)](https://www.researchgate.net/publication/349589153_Interpretability_Techniques_for_Deep_Learning_based_Segmentation_Models)
