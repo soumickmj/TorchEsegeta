@@ -97,9 +97,7 @@ def _serialize_normalized_array(array, fmt='png', quality=70):
     image = PIL.Image.fromarray(array)
     image_bytes = BytesIO()
     image.save(image_bytes, fmt, quality=quality)
-    # TODO: Python 3 could save a copy here by using `getbuffer()` instead.
-    image_data = image_bytes.getvalue()
-    return image_data
+    return image_bytes.getvalue()
 
 
 def serialize_array(array, domain=(0, 1), fmt='png', quality=70):
@@ -143,9 +141,9 @@ def array_to_jsbuffer(array):
         raise TypeError('Only 1d arrays can be converted JS TypedArray.')
     if array.dtype.name not in JS_ARRAY_TYPES:
         raise TypeError('Array dtype not supported by JS TypedArray.')
-    js_type_name = array.dtype.name.capitalize() + 'Array'
+    js_type_name = f'{array.dtype.name.capitalize()}Array'
     data_base64 = base64.b64encode(array.tobytes()).decode('ascii')
-    code = """
+    return """
         (function() {
             const data = atob("%s");
             const buf = new Uint8Array(data.length);
@@ -158,5 +156,7 @@ def array_to_jsbuffer(array):
             }
             return new array_type(buf.buffer);
         })()
-    """ % (data_base64, js_type_name)
-    return code
+    """ % (
+        data_base64,
+        js_type_name,
+    )

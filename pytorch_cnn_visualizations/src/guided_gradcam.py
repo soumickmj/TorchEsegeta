@@ -21,8 +21,7 @@ def guided_grad_cam(grad_cam_mask, guided_backprop_mask):
         grad_cam_mask (np_arr): Class activation map mask
         guided_backprop_mask (np_arr):Guided backprop mask
     """
-    cam_gb = np.multiply(grad_cam_mask, guided_backprop_mask)
-    return cam_gb
+    return np.multiply(grad_cam_mask, guided_backprop_mask)
 
 
 if __name__ == '__main__':
@@ -45,7 +44,7 @@ if __name__ == '__main__':
 
     # Guided Grad cam
     cam_gb = guided_grad_cam(cam, guided_grads)
-    save_gradient_images(cam_gb, file_name_to_export + '_GGrad_Cam')
+    save_gradient_images(cam_gb, f'{file_name_to_export}_GGrad_Cam')
     grayscale_cam_gb = convert_to_grayscale(cam_gb)
-    save_gradient_images(grayscale_cam_gb, file_name_to_export + '_GGrad_Cam_gray')
+    save_gradient_images(grayscale_cam_gb, f'{file_name_to_export}_GGrad_Cam_gray')
     print('Guided grad cam completed')

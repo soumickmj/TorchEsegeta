@@ -46,7 +46,7 @@ def save_gradient_images(gradient, file_name):
     gradient = gradient - gradient.min()
     gradient /= gradient.max()
     # Save image
-    path_to_file = os.path.join('../results', file_name + '.jpg')
+    path_to_file = os.path.join('../results', f'{file_name}.jpg')
     save_image(gradient, path_to_file)
 
 
@@ -64,13 +64,13 @@ def save_class_activation_images(org_img, activation_map, file_name):
     # Grayscale activation map
     heatmap, heatmap_on_image = apply_colormap_on_image(org_img, activation_map, 'hsv')
     # Save colored heatmap
-    path_to_file = os.path.join('../results', file_name+'_Cam_Heatmap.png')
+    path_to_file = os.path.join('../results', f'{file_name}_Cam_Heatmap.png')
     save_image(heatmap, path_to_file)
     # Save heatmap on iamge
-    path_to_file = os.path.join('../results', file_name+'_Cam_On_Image.png')
+    path_to_file = os.path.join('../results', f'{file_name}_Cam_On_Image.png')
     save_image(heatmap_on_image, path_to_file)
     # SAve grayscale heatmap
-    path_to_file = os.path.join('../results', file_name+'_Cam_Grayscale.png')
+    path_to_file = os.path.join('../results', f'{file_name}_Cam_Grayscale.png')
     save_image(activation_map, path_to_file)
 
 
@@ -174,9 +174,7 @@ def preprocess_image(pil_im, resize_im=True):
     im_as_ten = torch.from_numpy(im_as_arr).float()
     # Add one more channel to the beginning. Tensor shape = 1,3,224,224
     im_as_ten.unsqueeze_(0)
-    # Convert to Pytorch variable
-    im_as_var = Variable(im_as_ten, requires_grad=True)
-    return im_as_var
+    return Variable(im_as_ten, requires_grad=True)
 
 
 def recreate_image(im_as_var):

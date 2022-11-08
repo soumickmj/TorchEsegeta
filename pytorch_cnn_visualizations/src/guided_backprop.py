@@ -81,11 +81,7 @@ class GuidedBackprop():
         one_hot_output[0][target_class] = 1
         # Backward pass
         model_output.backward(gradient=one_hot_output.to(device), retain_graph = True)
-        # Convert Pytorch variable to numpy array
-        # [0] to get rid of the first channel (1,3,224,224)
-        gradients_as_arr = self.gradients.data.cpu().numpy()[0]
-        # print(gradients_as_arr.shape)
-        return gradients_as_arr
+        return self.gradients.data.cpu().numpy()[0]
 
 
 if __name__ == '__main__':
@@ -98,13 +94,16 @@ if __name__ == '__main__':
     # Get gradients
     guided_grads = GBP.generate_gradients(prep_img, target_class)
     # Save colored gradients
-    save_gradient_images(guided_grads, file_name_to_export + '_Guided_BP_color')
+    save_gradient_images(guided_grads, f'{file_name_to_export}_Guided_BP_color')
     # Convert to grayscale
     grayscale_guided_grads = convert_to_grayscale(guided_grads)
     # Save grayscale gradients
-    save_gradient_images(grayscale_guided_grads, file_name_to_export + '_Guided_BP_gray')
+    save_gradient_images(
+        grayscale_guided_grads, f'{file_name_to_export}_Guided_BP_gray'
+    )
+
     # Positive and negative saliency maps
     pos_sal, neg_sal = get_positive_negative_saliency(guided_grads)
-    save_gradient_images(pos_sal, file_name_to_export + '_pos_sal')
-    save_gradient_images(neg_sal, file_name_to_export + '_neg_sal')
+    save_gradient_images(pos_sal, f'{file_name_to_export}_pos_sal')
+    save_gradient_images(neg_sal, f'{file_name_to_export}_neg_sal')
     print('Guided backprop completed')

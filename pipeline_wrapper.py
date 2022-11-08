@@ -12,9 +12,8 @@ except:
 
 class Pipeline_multi_process:
     def __init__(self, model = None, jsonpath= None , chekpoint = None ):
-        f = open(jsonpath)
-        config = json.load(f)
-        f.close()
+        with open(jsonpath) as f:
+            config = json.load(f)
         unique_device_list = set(map(lambda method: method['device_id'], config['methods']))
         self.config_list = []
         self.pipeline_obj_list = []
@@ -25,10 +24,15 @@ class Pipeline_multi_process:
             #self.config_list.append(temp_config)
             self.config_list += self.share_gpu_split(temp_config)
 
-        count = 1
-        for configs in self.config_list:
-            self.pipeline_obj_list.append(Pipeline(model= model, jsonpath=configs, chekpoint= chekpoint, instance_id=count))
-            count += 1
+        self.pipeline_obj_list.extend(
+            Pipeline(
+                model=model,
+                jsonpath=configs,
+                chekpoint=chekpoint,
+                instance_id=count,
+            )
+            for count, configs in enumerate(self.config_list, start=1)
+        )
 
     def interpret_explain(self, **kwargs):
         jobs = []

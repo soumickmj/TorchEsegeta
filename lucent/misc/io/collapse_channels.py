@@ -41,11 +41,7 @@ def hue_to_rgb(ang, warp=True):
         # warping the angle away from the primary colors (RGB)
         # helps make equally-spaced angles more visually distinguishable
         adj = lambda x: math.sin(x * math.pi / 2)
-        if n % 2 == 0:
-            D = adj(D)
-        else:
-            D = 1 - adj(1 - D)
-
+        D = adj(D) if n % 2 == 0 else 1 - adj(1 - D)
     v = (1-D) * colors[n] + D * colors[(n+1) % len(colors)]
     return v / np.linalg.norm(v)
 

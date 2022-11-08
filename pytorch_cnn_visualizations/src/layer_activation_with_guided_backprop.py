@@ -83,43 +83,12 @@ class GuidedBackprop():
         self.model.zero_grad()
         # Forward pass
         x = input_image
-      
-        #for index, layer in (self.model._modules.items()):
-            # Forward pass layer by layer
-            # x is not used after this point because it is only needed to trigger
-            # the forward hook function
 
-            #input_shape = x.shape[-2:]                
-            #x = layer(x)#['out']
-            #print(x.shape)
-            
-            
-            #x = F.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
-            
-            #op_max = torch.argmax(x,dim=1, keepdim=True)
-            
-            # print(op_max.shape)
-            
-            # selected_inds = torch.zeros_like(x[0:1]).scatter_(1, op_max, 1)
-            # x = (x * selected_inds).sum(dim=(2,3))
-            # print(x.shape)
-
-            # print([x.keys()])
-            # x = x['aux']
-            # #print(x)
-
-            # Only need to forward until the selected layer is reached
-            #if index == cnn_layer:
-                # (forward hook function triggered)
-               # break
         op = self.model(x)
         conv_output = torch.sum(torch.abs(self.output[0, filter_pos]))
         # Backward pass
         conv_output.backward()
-        # Convert Pytorch variable to numpy array
-        # [0] to get rid of the first channel (1,3,224,224)
-        gradients_as_arr = self.gradients.data.cpu().numpy()[0]
-        return gradients_as_arr
+        return self.gradients.data.cpu().numpy()[0]
 
 
 if __name__ == '__main__':
@@ -130,19 +99,25 @@ if __name__ == '__main__':
         get_example_params(target_example)
 
     # File export name
-    file_name_to_export = file_name_to_export + '_layer' + str(cnn_layer) + '_filter' + str(filter_pos)
+    file_name_to_export = (
+        f'{file_name_to_export}_layer{cnn_layer}_filter{filter_pos}'
+    )
+
     # Guided backprop
     GBP = GuidedBackprop(pretrained_model)
     # Get gradients
     guided_grads = GBP.generate_gradients(prep_img, target_class, cnn_layer, filter_pos)
     # Save colored gradients
-    save_gradient_images(guided_grads, file_name_to_export + '_Guided_BP_color')
+    save_gradient_images(guided_grads, f'{file_name_to_export}_Guided_BP_color')
     # Convert to grayscale
     grayscale_guided_grads = convert_to_grayscale(guided_grads)
     # Save grayscale gradients
-    save_gradient_images(grayscale_guided_grads, file_name_to_export + '_Guided_BP_gray')
+    save_gradient_images(
+        grayscale_guided_grads, f'{file_name_to_export}_Guided_BP_gray'
+    )
+
     # Positive and negative saliency maps
     pos_sal, neg_sal = get_positive_negative_saliency(guided_grads)
-    save_gradient_images(pos_sal, file_name_to_export + '_pos_sal')
-    save_gradient_images(neg_sal, file_name_to_export + '_neg_sal')
+    save_gradient_images(pos_sal, f'{file_name_to_export}_pos_sal')
+    save_gradient_images(neg_sal, f'{file_name_to_export}_neg_sal')
     print('Layer Guided backprop completed')

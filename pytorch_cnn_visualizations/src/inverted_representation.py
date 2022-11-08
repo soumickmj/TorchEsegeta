@@ -22,8 +22,7 @@ class InvertedRepresentation():
         """
             Converts matrix to vector then calculates the alpha norm
         """
-        alpha_norm = ((input_matrix.view(-1))**alpha).sum()
-        return alpha_norm
+        return ((input_matrix.view(-1))**alpha).sum()
 
     def total_variation_norm(self, input_matrix, beta):
         """
@@ -33,9 +32,10 @@ class InvertedRepresentation():
         to_check = input_matrix[:, :-1, :-1]  # Trimmed: right - bottom
         one_bottom = input_matrix[:, 1:, :-1]  # Trimmed: top - right
         one_right = input_matrix[:, :-1, 1:]  # Trimmed: top - right
-        total_variation = (((to_check - one_bottom)**2 +
-                            (to_check - one_right)**2)**(beta/2)).sum()
-        return total_variation
+        return (
+            ((to_check - one_bottom) ** 2 + (to_check - one_right) ** 2)
+            ** (beta / 2)
+        ).sum()
 
     def euclidian_loss(self, org_matrix, target_matrix):
         """
@@ -44,8 +44,7 @@ class InvertedRepresentation():
         """
         distance_matrix = target_matrix - org_matrix
         euclidian_distance = self.alpha_norm(distance_matrix, 2)
-        normalized_euclidian_distance = euclidian_distance / self.alpha_norm(org_matrix, 2)
-        return normalized_euclidian_distance
+        return euclidian_distance / self.alpha_norm(org_matrix, 2)
 
     def get_output_from_specific_layer(self, x, layer_id):
         """
@@ -69,7 +68,7 @@ class InvertedRepresentation():
         # Get the output from the model after a forward pass until target_layer
         # with the input image (real image, NOT the randomly generated one)
         input_image_layer_output = \
-            self.get_output_from_specific_layer(input_image, target_layer)
+                self.get_output_from_specific_layer(input_image, target_layer)
 
         # Alpha regularization parametrs
         # Parameter alpha, which is actually sixth norm
@@ -102,10 +101,10 @@ class InvertedRepresentation():
             optimizer.step()
             # Generate image every 5 iterations
             if i % 5 == 0:
-                print('Iteration:', str(i), 'Loss:', loss.data.numpy())
+                print('Iteration:', i, 'Loss:', loss.data.numpy())
                 recreated_im = recreate_image(opt_img)
-                im_path = '../generated/Inv_Image_Layer_' + str(target_layer) + \
-                    '_Iteration_' + str(i) + '.jpg'
+                im_path = f'../generated/Inv_Image_Layer_{str(target_layer)}_Iteration_{str(i)}.jpg'
+
                 save_image(recreated_im, im_path)
 
             # Reduce learning rate every 40 iterations

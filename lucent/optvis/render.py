@@ -51,10 +51,12 @@ def render_vis(
     if is_3d:
         height, width , depth = shape[0], shape[1], shape[2]
     if param_f is None:
-        if not is_3d:
-            param_f = lambda: param.image(128)
-        else:
-            param_f = lambda : param.image(width, height,channels=depth)
+        param_f = (
+            (lambda: param.image(width, height, channels=depth))
+            if is_3d
+            else (lambda: param.image(128))
+        )
+
     # param_f is a function that should return two things
     # params - parameters to update, which we pass to the optimizer
     # image_f - a function that returns an image as a tensor
@@ -106,11 +108,10 @@ def render_vis(
             try:
                 if not is_3d:
                     model(transform_f(image_f()))
+                elif isDepthFirst:
+                    model(torch.unsqueeze(image_f(), 1))
                 else:
-                    if not isDepthFirst:
-                        model(torch.unsqueeze(image_f().transpose(1,-1), 1))
-                    else:
-                        model(torch.unsqueeze(image_f(), 1))
+                    model(torch.unsqueeze(image_f().transpose(1,-1), 1))
             except RuntimeError as ex:
                 if i == 1:
                     # Only display the warning message
@@ -161,10 +162,11 @@ def tensor_to_img_array(tensor):
 
 def view(tensor):
     image = tensor_to_img_array(tensor)
-    assert len(image.shape) in [
+    assert len(image.shape) in {
         3,
         4,
-    ], "Image should have 3 or 4 dimensions, invalid image shape {}".format(image.shape)
+    }, f"Image should have 3 or 4 dimensions, invalid image shape {image.shape}"
+
     # Change dtype for PIL.Image
     image = (image * 255).astype(np.uint8)
     if len(image.shape) == 4:
@@ -175,10 +177,11 @@ def view(tensor):
 def export(tensor, image_name=None):
     image_name = image_name or "image.jpg"
     image = tensor_to_img_array(tensor)
-    assert len(image.shape) in [
+    assert len(image.shape) in {
         3,
         4,
-    ], "Image should have 3 or 4 dimensions, invalid image shape {}".format(image.shape)
+    }, f"Image should have 3 or 4 dimensions, invalid image shape {image.shape}"
+
     # Change dtype for PIL.Image
     image = (image * 255).astype(np.uint8)
     if len(image.shape) == 4:

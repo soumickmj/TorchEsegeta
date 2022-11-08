@@ -76,9 +76,8 @@ class Interpretability:
         aggregator = tio.inference.GridAggregator(grid_sampler, overlap_mode="average")
 
         params.pop("ip")
-        indx = 1
         uncertain_metrics_perpatch = []
-        for patches_batch in patch_loader:
+        for indx, patches_batch in enumerate(patch_loader, start=1):
             input_tensor = patches_batch['image'][tio.DATA].float().to(device)
             locations = patches_batch[tio.LOCATION]
             with autocast(enabled=self.amp_enbled):
@@ -104,10 +103,9 @@ class Interpretability:
                             attribution = torch.tensor(attribution, dtype= torch.float32)
                         else:
                             attribution = attribution.detach().cpu()
-            if not list(attribution.shape) == list(input_tensor.shape):
+            if list(attribution.shape) != list(input_tensor.shape):
                 attribution = torch.reshape(attribution, list(input_tensor.shape))
             aggregator.add_batch(attribution, locations)
-            indx += 1
         output_tensor = aggregator.get_output_tensor()
         if uncertainity is not None:
             df = pd.DataFrame(uncertain_metrics_perpatch)
@@ -124,14 +122,14 @@ class Interpretability:
 
     ## Input transformation function
     def inpTransformSetup(self, resize, centre_crop, mean_vec, std_vec):
-        data_transform = transforms.Compose([
-            transforms.Resize(resize),
-            transforms.CenterCrop(centre_crop),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=mean_vec,
-                                 std=std_vec),
-        ])
-        return data_transform
+        return transforms.Compose(
+            [
+                transforms.Resize(resize),
+                transforms.CenterCrop(centre_crop),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=mean_vec, std=std_vec),
+            ]
+        )
 
     ## Extended method for Captum saliency map
     def captum_Saliency(self, forward_func, target, inp_image, inp_transform_flag,
@@ -153,8 +151,7 @@ class Interpretability:
 
         saliency = Saliency(forward_func)
         fig = plt.figure(figsize=(9, 6))
-        idx = 1
-        for i in target:
+        for idx, i in enumerate(target, start=1):
 
             if uncertainity_flag:
                 uncertainity = Uncertainity(forward_func=forward_func, method=Saliency,
@@ -200,19 +197,26 @@ class Interpretability:
                 nb.save(img, os.path.join(output_path, input_file + '_Saliency_Class_' + str(i) + name_tag+ ".nii.gz"))
             else:
 
-                if isDepthFirst:
-                     grads = np.moveaxis(grads.squeeze().cpu().detach().numpy(), 0, -1)
-                else:
-                     grads = grads.squeeze().cpu().detach().numpy()
+                grads = (
+                    np.moveaxis(grads.squeeze().cpu().detach().numpy(), 0, -1)
+                    if isDepthFirst
+                    else grads.squeeze().cpu().detach().numpy()
+                )
 
                 original_image = np.transpose(ip.squeeze().cpu().detach().numpy(), (1, 2, 0))
 
                 axis = fig.add_subplot(1, len(target), idx)
-                fig, _ = viz.visualize_image_attr(grads, original_image, use_pyplot=False, method=visualize_method,
-                                                  sign=sign,
-                                                  show_colorbar=show_colorbar, title='Class ' + str(i),
-                                                  plt_fig_axis=(fig, axis))
-            idx += 1
+                fig, _ = viz.visualize_image_attr(
+                    grads,
+                    original_image,
+                    use_pyplot=False,
+                    method=visualize_method,
+                    sign=sign,
+                    show_colorbar=show_colorbar,
+                    title=f'Class {str(i)}',
+                    plt_fig_axis=(fig, axis),
+                )
+
         if is_3d:
             if uncertainity_flag:
                 metrics = self.uncertain_metrics
@@ -224,27 +228,31 @@ class Interpretability:
         if nt_type:
             nt = NoiseTunnel(saliency)
             fig = plt.figure(figsize=(9, 6))
-            idx = 1
-            for i in target:
+            for idx, i in enumerate(target, start=1):
                 grad_nt = nt.attribute(ip, nt_type=nt_type, n_samples=n_samples, target=int(i))
                 grad_nt = np.transpose(grad_nt.squeeze().cpu().detach().numpy(), (1, 2, 0))
                 original_image = np.transpose(ip.squeeze().cpu().detach().numpy(), (1, 2, 0))
                 axis = fig.add_subplot(1, len(target), idx)
-                fig, _ = viz.visualize_image_attr(grad_nt, original_image, use_pyplot=False, method=visualize_method,
-                                                  sign=sign,
-                                                  show_colorbar=show_colorbar,
-                                                  title="Class " + str(i), plt_fig_axis=(fig, axis))
-                idx += 1
+                fig, _ = viz.visualize_image_attr(
+                    grad_nt,
+                    original_image,
+                    use_pyplot=False,
+                    method=visualize_method,
+                    sign=sign,
+                    show_colorbar=show_colorbar,
+                    title=f"Class {str(i)}",
+                    plt_fig_axis=(fig, axis),
+                )
+
             fig.suptitle(title + " with noise tunnel")
             fig.savefig(output_path + "/" + input_file + '_Saliency_noise_tunnel_' + visualize_method + ".png")
 
         ip.requires_grad = False
-        if uncertainity_flag:
-            metrics = self.uncertain_metrics
-            self.uncertain_metrics = []
-            return metrics
-
-        else: return  None
+        if not uncertainity_flag:
+            return  None
+        metrics = self.uncertain_metrics
+        self.uncertain_metrics = []
+        return metrics
 
 
     def captum_Integrated_Gradients(self, forward_func, target, inp_image, inp_transform_flag, transform_func,
@@ -266,8 +274,7 @@ class Interpretability:
 
         ig = IntegratedGradients(forward_func)
         fig = plt.figure(figsize=(9, 6))
-        idx = 1
-        for i in target:
+        for idx, i in enumerate(target, start=1):
             if uncertainity_flag:
                 uncertainity = Uncertainity(forward_func=forward_func, method=Saliency,
                                             method_attribution=ig.attribute,
@@ -307,20 +314,25 @@ class Interpretability:
                 img = nb.Nifti1Image(grads, np.eye(affine_size))
                 nb.save(img, os.path.join(output_path, input_file + '_IG_Class_' + str(i) +name_tag+ ".nii.gz"))
             else:
-                if isDepthFirst:
-                    grads = np.moveaxis(grads.squeeze().cpu().detach().numpy(), 0, -1)
-
-                else:
-                    grads = grads.squeeze().cpu().detach().numpy()
+                grads = (
+                    np.moveaxis(grads.squeeze().cpu().detach().numpy(), 0, -1)
+                    if isDepthFirst
+                    else grads.squeeze().cpu().detach().numpy()
+                )
 
                 original_image = np.transpose(ip.squeeze().cpu().detach().numpy(), (1, 2, 0))
 
                 axis = fig.add_subplot(1, len(target), idx)
-                fig, _ = viz.visualize_image_attr(grads, original_image, use_pyplot=False, method=visualize_method,
-                                                  sign=sign,
-                                                  show_colorbar=show_colorbar, title='Class ' + str(i),
-                                                  plt_fig_axis=(fig, axis))
-            idx += 1
+                fig, _ = viz.visualize_image_attr(
+                    grads,
+                    original_image,
+                    use_pyplot=False,
+                    method=visualize_method,
+                    sign=sign,
+                    show_colorbar=show_colorbar,
+                    title=f'Class {str(i)}',
+                    plt_fig_axis=(fig, axis),
+                )
 
         if is_3d:
             if uncertainity_flag:
@@ -335,28 +347,31 @@ class Interpretability:
         if nt_type:
             nt = NoiseTunnel(ig)
             fig = plt.figure(figsize=(9, 6))
-            idx = 1
-            for i in target:
+            for idx, i in enumerate(target, start=1):
                 grads_nt = nt.attribute(ip, nt_type=nt_type, n_samples=n_samples, target=int(i))
                 grads_nt = np.transpose(grads_nt.squeeze().cpu().detach().numpy(), (1, 2, 0))
                 axis = fig.add_subplot(1, len(target), idx)
-                fig, _ = viz.visualize_image_attr(grads_nt, original_image, use_pyplot=False, method=visualize_method,
-                                                  sign=sign,
-                                                  show_colorbar=show_colorbar, title="Class " + str(i),
-                                                  plt_fig_axis=(fig, axis))
-                idx += 1
+                fig, _ = viz.visualize_image_attr(
+                    grads_nt,
+                    original_image,
+                    use_pyplot=False,
+                    method=visualize_method,
+                    sign=sign,
+                    show_colorbar=show_colorbar,
+                    title=f"Class {str(i)}",
+                    plt_fig_axis=(fig, axis),
+                )
 
             fig.suptitle(title + " with noise tunnel")
             fig.savefig(output_path + "/" + input_file + '_IG_noise_tunnel_' + visualize_method + ".png")
 
         ip.requires_grad = False
 
-        if uncertainity_flag:
-            metrics = self.uncertain_metrics
-            self.uncertain_metrics = []
-            return metrics
-        else:
+        if not uncertainity_flag:
             return None
+        metrics = self.uncertain_metrics
+        self.uncertain_metrics = []
+        return metrics
 
     def captum_Feature_Ablation(self, forward_func, target, inp_image, inp_transform_flag, transform_func,
                                 uncertainity_flag,visualize_method, sign, show_colorbar, title, device, library, output_path, input_file, is_3d,

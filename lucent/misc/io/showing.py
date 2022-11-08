@@ -54,7 +54,7 @@ def _image_url(array, fmt='png', mode="data", quality=90, domain=None):
 
     image_data = serialize_array(array, fmt=fmt, quality=quality, domain=domain)
     base64_byte_string = base64.b64encode(image_data).decode('ascii')
-    return "data:image/" + fmt.upper() + ";base64," + base64_byte_string
+    return f"data:image/{fmt.upper()};base64,{base64_byte_string}"
 
 
 # public functions
@@ -146,21 +146,18 @@ def show(thing, domain=(0, 1), **kwargs):
     """
     def collapse_if_needed(arr):
         channels = arr.shape[-1]
-        if channels not in [1, 3, 4]:
-            # log.debug("Collapsing %s channels into 3 RGB channels." % K)
-            return collapse_channels(arr)
-        return arr
+        return collapse_channels(arr) if channels not in [1, 3, 4] else arr
 
     if isinstance(thing, np.ndarray):
         rank = len(thing.shape)
 
-        if rank in [3, 4]:
+        if rank in {3, 4}:
             thing = collapse_if_needed(thing)
 
         if rank == 4:
             # log.debug("Show is assuming rank 4 tensor to be a list of images.")
             images(thing, domain=domain, **kwargs)
-        elif rank in (2, 3):
+        elif rank in {2, 3}:
             # log.debug("Show is assuming rank 2 or 3 tensor to be an image.")
             image(thing, domain=domain, **kwargs)
         else:

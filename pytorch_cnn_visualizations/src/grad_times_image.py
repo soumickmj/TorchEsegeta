@@ -3,6 +3,7 @@ Created on Wed Jun 19 17:12:04 2019
 
 @author: Utku Ozbulak - github.com/utkuozbulak
 """
+
 from pytorch_cnn_visualizations.src.misc_functions import (get_example_params,
                             convert_to_grayscale,
                             save_gradient_images)
@@ -24,6 +25,9 @@ if __name__ == '__main__':
     # Convert to grayscale
     grayscale_vanilla_grads = convert_to_grayscale(grad_times_image)
     # Save grayscale gradients
-    save_gradient_images(grayscale_vanilla_grads,
-                         file_name_to_export + '_Vanilla_grad_times_image_gray')
+    save_gradient_images(
+        grayscale_vanilla_grads,
+        f'{file_name_to_export}_Vanilla_grad_times_image_gray',
+    )
+
     print('Grad times image completed.')

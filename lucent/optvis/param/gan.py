@@ -32,12 +32,11 @@ def load_statedict_from_online(name="fc6"):
     torchhome = torch.hub._get_torch_home()
     ckpthome = join(torchhome, "checkpoints")
     os.makedirs(ckpthome, exist_ok=True)
-    filepath = join(ckpthome, "upconvGAN_%s.pt"%name)
+    filepath = join(ckpthome, f"upconvGAN_{name}.pt")
     if not os.path.exists(filepath):
         torch.hub.download_url_to_file(model_urls[name], filepath, hash_prefix=None,
                                    progress=True)
-    SD = torch.load(filepath)
-    return SD
+    return torch.load(filepath)
 
 
 class View(nn.Module):

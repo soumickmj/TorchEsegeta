@@ -36,7 +36,7 @@ class MultiClassSegmentWrapper(nn.Module):
         if type(out) is list:
             out = out[0]
         op_max = torch.argmax(out, dim=1, keepdim=True)
-        selected_inds = torch.zeros_like(out[0:]).scatter_(1, op_max, 1)
+        selected_inds = torch.zeros_like(out[:]).scatter_(1, op_max, 1)
         return (out * selected_inds).sum(dim=(-2, -1))
 
 

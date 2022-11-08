@@ -31,12 +31,8 @@ import torchvision.transforms as transforms
 from SegmentModel.VesselSeg_UNet3d import U_Net
 
 
-# Opening JSON file 
-f = open('cfg_Misc_Class_2d.json')
-
-config = json.load(f) 
-f.close()
-
+with open('cfg_Misc_Class_2d.json') as f:
+    config = json.load(f)
 model = None
 inp = None
 inp_path = None
@@ -52,40 +48,39 @@ if config["default"] and not config["is_3d"]:
         inp_path = 'imagenetImage.jpg'
         inp = Image.open(inp_path)
         model.eval()
-else:
-    if config["default"] and config["is_3d"] :
-        if config['model_nature'] == 'Classification':
-            inp_path = 'IXI012-HH-1211-T1_brain_resampled.nii.gz'
-            inp = nb.load(inp_path)
-            inp = inp.get_fdata()
-            inp  =zoom(inp, (0.4, 0.4, 0.5))
-            inp = torch.from_numpy(inp)
-            inp = torch.unsqueeze(inp, 0).float()
-            model = models.video.r3d_18(pretrained=True)
-            model.stem = R2Plus1dStem4MRI()
-            model.fc = nn.Sequential(
-                nn.Dropout(0.5),
-                nn.Linear(model.fc.in_features, 3)
-            )
-            # model_3d.to('cuda:0')
+elif config["default"]:
+    if config['model_nature'] == 'Classification':
+        inp_path = 'IXI012-HH-1211-T1_brain_resampled.nii.gz'
+        inp = nb.load(inp_path)
+        inp = inp.get_fdata()
+        inp  =zoom(inp, (0.4, 0.4, 0.5))
+        inp = torch.from_numpy(inp)
+        inp = torch.unsqueeze(inp, 0).float()
+        model = models.video.r3d_18(pretrained=True)
+        model.stem = R2Plus1dStem4MRI()
+        model.fc = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(model.fc.in_features, 3)
+        )
+        # model_3d.to('cuda:0')
 
-            ckpt = load_checkpoint('resnet3D_0.001')
-            model.load_state_dict(ckpt['state_dict'])
-            model.eval()
-        if config['model_nature'] == 'Segmentation':
-            inp_path = 'SegmentModel/data/IXI425-IOP-0988-MRA.nii.gz'
-            inp = nb.load(inp_path)
-            inp = inp.get_fdata()
-            inp = zoom(inp, (0.125, 0.125, 0.35))
-            inp = (inp - np.min(inp)) / (np.max(inp) - np.min(inp))
-            inp = np.moveaxis(inp, -1, 0)
-            inp = torch.from_numpy(inp)
-            inp = torch.unsqueeze(inp, 0).float()
-            model = U_Net()
-            ckpt = load_checkpoint('SegmentModel/VesselSeg_UNet3d_base_02-27.pth')
-            model.load_state_dict(ckpt['state_dict'])
-            model.eval()
-            #model = NetCustom(model)
+        ckpt = load_checkpoint('resnet3D_0.001')
+        model.load_state_dict(ckpt['state_dict'])
+        model.eval()
+    if config['model_nature'] == 'Segmentation':
+        inp_path = 'SegmentModel/data/IXI425-IOP-0988-MRA.nii.gz'
+        inp = nb.load(inp_path)
+        inp = inp.get_fdata()
+        inp = zoom(inp, (0.125, 0.125, 0.35))
+        inp = (inp - np.min(inp)) / (np.max(inp) - np.min(inp))
+        inp = np.moveaxis(inp, -1, 0)
+        inp = torch.from_numpy(inp)
+        inp = torch.unsqueeze(inp, 0).float()
+        model = U_Net()
+        ckpt = load_checkpoint('SegmentModel/VesselSeg_UNet3d_base_02-27.pth')
+        model.load_state_dict(ckpt['state_dict'])
+        model.eval()
+        #model = NetCustom(model)
 
 #intr= Interpretability(resModel)
 

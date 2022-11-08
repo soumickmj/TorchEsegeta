@@ -26,8 +26,8 @@ class ClassSpecificImageGeneration():
         # Generate a random image
         self.created_image = np.uint8(np.random.uniform(0, 255, (224, 224, 3)))
         # Create the folder to export images if not exists
-        if not os.path.exists('../generated/class_'+str(self.target_class)):
-            os.makedirs('../generated/class_'+str(self.target_class))
+        if not os.path.exists(f'../generated/class_{str(self.target_class)}'):
+            os.makedirs(f'../generated/class_{str(self.target_class)}')
 
     def generate(self, iterations=150):
         """Generates class specific image
@@ -51,8 +51,7 @@ class ClassSpecificImageGeneration():
             class_loss = -output[0, self.target_class]
 
             if i % 10 == 0 or i == iterations-1:
-                print('Iteration:', str(i), 'Loss',
-                      "{0:.2f}".format(class_loss.data.numpy()))
+                print('Iteration:', i, 'Loss', "{0:.2f}".format(class_loss.data.numpy()))
             # Zero grads
             self.model.zero_grad()
             # Backward
@@ -63,7 +62,8 @@ class ClassSpecificImageGeneration():
             self.created_image = recreate_image(self.processed_image)
             if i % 10 == 0 or i == iterations-1:
                 # Save image
-                im_path = '../generated/class_'+str(self.target_class)+'/c_'+str(self.target_class)+'_'+'iter_'+str(i)+'.png'
+                im_path = f'../generated/class_{str(self.target_class)}/c_{str(self.target_class)}_iter_{str(i)}.png'
+
                 save_image(self.created_image, im_path)
 
         return self.processed_image

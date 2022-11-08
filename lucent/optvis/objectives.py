@@ -45,7 +45,7 @@ class Objective():
 
     @staticmethod
     def sum(objs):
-        objective_func = lambda T: sum([obj(T) for obj in objs])
+        objective_func = lambda T: sum(obj(T) for obj in objs)
         descriptions = [obj.description for obj in objs]
         description = "Sum(" + " +\n".join(descriptions) + ")"
         names = [obj.name for obj in objs]
@@ -59,19 +59,23 @@ class Objective():
         return self + (-1 * other)
 
     def __mul__(self, other):
-        if isinstance(other, (int, float)):
-            objective_func = lambda model: other * self(model)
-            return Objective(objective_func, name=self.name, description=self.description)
-        else:
+        if not isinstance(other, (int, float)):
             # Note: In original Lucid library, objectives can be multiplied with non-numbers
             # Removing for now until we find a good use case
-            raise TypeError('Can only multiply by int or float. Received type ' + str(type(other)))
+            raise TypeError(
+                f'Can only multiply by int or float. Received type {str(type(other))}'
+            )
+
+        objective_func = lambda model: other * self(model)
+        return Objective(objective_func, name=self.name, description=self.description)
 
     def __truediv__(self, other):
         if isinstance(other, (int, float)):
             return self.__mul__(1 / other)
         else:
-            raise TypeError('Can only divide by int or float. Received type ' + str(type(other)))
+            raise TypeError(
+                f'Can only divide by int or float. Received type {str(type(other))}'
+            )
 
     def __rmul__(self, other):
         return self.__mul__(other)
@@ -340,9 +344,16 @@ def diversity(layer):
         flattened = layer_t.view(batch, channels, -1)
         grams = torch.matmul(flattened, torch.transpose(flattened, 1, 2))
         grams = F.normalize(grams, p=2, dim=(1, 2))
-        return -sum([ sum([ (grams[i]*grams[j]).sum()
-               for j in range(batch) if j != i])
-               for i in range(batch)]) / batch
+        return (
+            -sum(
+                sum(
+                    (grams[i] * grams[j]).sum() for j in range(batch) if j != i
+                )
+                for i in range(batch)
+            )
+            / batch
+        )
+
     return inner
 
 

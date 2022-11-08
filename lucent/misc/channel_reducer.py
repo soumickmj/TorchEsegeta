@@ -100,16 +100,13 @@ class ChannelReducer(object):
         return ChannelReducer._apply_flat(self._reducer.transform, acts)
 
     def __call__(self, acts):
-        if self._is_fit:
-            return self.transform(acts)
-        else:
-            return self.fit_transform(acts)
+        return self.transform(acts) if self._is_fit else self.fit_transform(acts)
 
     def __getattr__(self, name):
         if name in self.__dict__:
             return self.__dict__[name]
-        elif name + "_" in self._reducer.__dict__:
-            return self._reducer.__dict__[name + "_"]
+        elif f"{name}_" in self._reducer.__dict__:
+            return self._reducer.__dict__[f"{name}_"]
 
     def __dir__(self):
         dynamic_attrs = [

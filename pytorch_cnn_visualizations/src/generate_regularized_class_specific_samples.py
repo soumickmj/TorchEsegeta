@@ -78,8 +78,7 @@ class RegularizedClassSpecificImageGeneration():
             class_loss = -output[0, self.target_class]
 
             if i in np.linspace(0, iterations, 10, dtype=int):
-                print('Iteration:', str(i), 'Loss',
-                      "{0:.2f}".format(class_loss.data.cpu().numpy()))
+                print('Iteration:', i, 'Loss', "{0:.2f}".format(class_loss.data.cpu().numpy()))
             # Zero grads
             self.model.zero_grad()
             # Backward
@@ -158,12 +157,11 @@ def preprocess_and_blur_image(pil_im, resize_im=True, blur_rad=None):
     im_as_ten = torch.from_numpy(im_as_arr).float()
     # Add one more channel to the beginning. Tensor shape = 1,3,224,224
     im_as_ten.unsqueeze_(0)
-    # Convert to Pytorch variable
-    if use_cuda:
-        im_as_var = Variable(im_as_ten.cuda(), requires_grad=True)
-    else:
-        im_as_var = Variable(im_as_ten, requires_grad=True)
-    return im_as_var
+    return (
+        Variable(im_as_ten.cuda(), requires_grad=True)
+        if use_cuda
+        else Variable(im_as_ten, requires_grad=True)
+    )
 
 if __name__ == '__main__':
     target_class = 130  # Flamingo

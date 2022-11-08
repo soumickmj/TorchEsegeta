@@ -40,7 +40,7 @@ def load_checkpoint(fpath):
     if fpath is None:
         raise ValueError('File path is None')
     if not osp.exists(fpath):
-        raise FileNotFoundError('File is not found at "{}"'.format(fpath))
+        raise FileNotFoundError(f'File is not found at "{fpath}"')
     map_location = 'cpu'
     try:
         checkpoint = torch.load(fpath, map_location=map_location)
@@ -51,7 +51,7 @@ def load_checkpoint(fpath):
             fpath, pickle_module=pickle, map_location=map_location
         )
     except Exception:
-        print('Unable to load checkpoint from "{}"'.format(fpath))
+        print(f'Unable to load checkpoint from "{fpath}"')
         raise
     return checkpoint
 

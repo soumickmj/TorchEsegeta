@@ -29,7 +29,7 @@ class CamExtractor():
         #for module_pos, module in self.model._modules.items():
         #    if module_pos == self.target_layer:
         #        module.register_forward_hook(self.hook_Func)
-        eval("self.model." + self.target_layer).register_forward_hook(self.hook_Func)
+        eval(f"self.model.{self.target_layer}").register_forward_hook(self.hook_Func)
 
     def forward_pass_on_convolutions(self, x):
         """

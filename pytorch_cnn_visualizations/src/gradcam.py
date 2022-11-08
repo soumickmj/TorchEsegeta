@@ -27,7 +27,7 @@ class CamExtractor():
         self.output.register_hook(self.save_gradient)
 
     def forward_hook(self):
-        eval("self.model." + self.target_layer).register_forward_hook(self.hook_Func)
+        eval(f"self.model.{self.target_layer}").register_forward_hook(self.hook_Func)
 
     # def forward_hook(self):
         # for module_pos, module in self.model._modules.items():

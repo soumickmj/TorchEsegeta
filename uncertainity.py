@@ -58,37 +58,36 @@ class Uncertainity:
         #     print("ip:",ip.shape)
         #     print("grad:",grads.shape)
 
-            if isinstance(ip, np.ndarray): ip = torch.from_numpy(ip)
-            if isinstance(grads, np.ndarray): grads = torch.from_numpy(grads)
-            grads = grads.to(self.device)
+        if isinstance(ip, np.ndarray): ip = torch.from_numpy(ip)
+        if isinstance(grads, np.ndarray): grads = torch.from_numpy(grads)
+        grads = grads.to(self.device)
 
-            if len(grads.shape)< len(ip.shape):
-                if 64 in list(grads.shape):
-                    axis = list(grads.shape).index(64)
-                    grads = torch.max(grads, dim=axis).values
+        if len(grads.shape) < len(ip.shape) and 64 in list(grads.shape):
+            axis = list(grads.shape).index(64)
+            grads = torch.max(grads, dim=axis).values
 
 
-                    if not self.batch_dim_present:
-                        grads = torch.unsqueeze(torch.unsqueeze(grads, 0), 0)
-                    else:
-                        ip = torch.squeeze(ip)
-            #     if list(grads.shape) == list(ip.shape)[-2:]:
-            #         grads = torch.unsqueeze(grads,0)
-            #         grads = torch.unsqueeze(torch.cat((grads,grads,grads),0),0)
-            #         grads.requires_grad = True
-            # print(grads.shape)
-            # print(ip.shape)
+            if not self.batch_dim_present:
+                grads = torch.unsqueeze(torch.unsqueeze(grads, 0), 0)
+            else:
+                ip = torch.squeeze(ip)
+        #     if list(grads.shape) == list(ip.shape)[-2:]:
+        #         grads = torch.unsqueeze(grads,0)
+        #         grads = torch.unsqueeze(torch.cat((grads,grads,grads),0),0)
+        #         grads.requires_grad = True
+        # print(grads.shape)
+        # print(ip.shape)
 
-            infi = self.infidelity_captum(forward_func=self.forward_func, input_img=ip, gradients=grads,
-                                          n_perturb_samples=1)
+        infi = self.infidelity_captum(forward_func=self.forward_func, input_img=ip, gradients=grads,
+                                      n_perturb_samples=1)
 
-            # print("\nInfidelity for Saliency: ", infi.item())
-            #
-            sensi = self.sensitivity_captum(input_img=ip, target=target, method=self.method_attribution,
-                                            n_perturb_samples=2, device= self.device, library= self.library, **kwargs)
-            # print("\n Sensitivity for Saliency: ", sensi.item())
+        # print("\nInfidelity for Saliency: ", infi.item())
+        #
+        sensi = self.sensitivity_captum(input_img=ip, target=target, method=self.method_attribution,
+                                        n_perturb_samples=2, device= self.device, library= self.library, **kwargs)
+        # print("\n Sensitivity for Saliency: ", sensi.item())
 
-            return {"infidelity": infi.item(), "sensitivity": sensi.item()}
+        return {"infidelity": infi.item(), "sensitivity": sensi.item()}
 
         # except:
         #     self.logger.error("Unexpected error")
@@ -106,12 +105,11 @@ def cascading_randomization(intr, method, forward_function, target, inp_image, i
     forward_func = copy.deepcopy(forward_function)
     layers = list(forward_func.children())
     if len(layers) == 1:
-        layers = [l for l in layers[0].children()]
+        layers = list(layers[0].children())
 
     layers.reverse()
-    idx = 1
     uncertainity_metrics = []
-    for layer in layers:
+    for idx, layer in enumerate(layers, start=1):
 
         for name, param in (layer.named_parameters()):
             forward_func.eval()
@@ -124,17 +122,34 @@ def cascading_randomization(intr, method, forward_function, target, inp_image, i
 
         forward_func.eval()
 
-        if "nt_type" in kwargs.keys():
+        if "nt_type" in kwargs:
             kwargs["nt_type"] = False
-        uncertain_metric = getattr(intr, method)(forward_func, target, inp_image, inp_transform_flag,
-                    transform_func, True if uncertainity_mode ==2 else False, visualize_method, sign, show_colorbar, title, device,
-                    library, output_path, input_file, is_3d, isDepthFirst, patcher_flag, batch_dim_present,
-                     **kwargs, name_tag ="_CasRand"  + "_" + str(idx))
+        uncertain_metric = getattr(intr, method)(
+            forward_func,
+            target,
+            inp_image,
+            inp_transform_flag,
+            transform_func,
+            uncertainity_mode == 2,
+            visualize_method,
+            sign,
+            show_colorbar,
+            title,
+            device,
+            library,
+            output_path,
+            input_file,
+            is_3d,
+            isDepthFirst,
+            patcher_flag,
+            batch_dim_present,
+            **kwargs,
+            name_tag="_CasRand" + "_" + str(idx)
+        )
+
 
 
         uncertainity_metrics.append(uncertain_metric)
-        idx += 1
-
     return uncertainity_metrics
 
 

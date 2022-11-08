@@ -10,10 +10,7 @@ def HeaderParams(path):
     with open(path) as jsonFile:
         jsonObject = json.load(jsonFile)
         jsonFile.close()
-    parameters = []
-    for k in jsonObject:
-        if k != "methods" and k != "explain_methods":
-            parameters.append(k)
+    parameters = [k for k in jsonObject if k not in ["methods", "explain_methods"]]
     parms = [[sg.Text('model_nature', size=(15, 1)),
               sg.Drop(values=('Segmentation', 'Classification'), default_value=jsonObject['model_nature'],
                       auto_size_text=True),
@@ -60,7 +57,7 @@ def HeaderParams(path):
         print(button, values)
 
     param_dict = dict(zip(parameters, values.values()))
-    param_dict.update({"methods": "0"})
+    param_dict["methods"] = "0"
 
     return param_dict, jsonObject
 
@@ -206,11 +203,7 @@ def MethodsSelector():
         'segmentation_lime',
         'DeepDream_CNN Visualization'
     ]
-    method_names = []
-    for i in values:
-        if values[i]:
-            method_names.append(methods[i])
-
+    method_names = [methods[i] for i in values if values[i]]
     print(method_names)
     return method_names
 
@@ -220,11 +213,16 @@ def loadParams(method_name, library_name, path):
         jsonObject = json.load(jsonFile)
         jsonFile.close()
         methods = jsonObject["methods"]
-    parameters = ""
-    for k in range(len(methods)):
-        if method_name.lower() in methods[k]["method_name"].lower() and methods[k]["library"] == library_name:
-            parameters = methods[k]
-            break
+    parameters = next(
+        (
+            methods[k]
+            for k in range(len(methods))
+            if method_name.lower() in methods[k]["method_name"].lower()
+            and methods[k]["library"] == library_name
+        ),
+        "",
+    )
+
     parms = [[sg.Text('inpt_transform_req', size=(15, 1)),
               sg.Drop(values=('true', 'false'), default_value=str(parameters['inpt_transform_req']),
                       auto_size_text=True),
@@ -251,7 +249,7 @@ def loadParams(method_name, library_name, path):
               sg.Drop(values=('true', 'false'), default_value=str(parameters['uncertainity']), auto_size_text=True),
               sg.Text('keywords', size=(15, 1)), sg.In(default_text=str(parameters['keywords']), size=(8, 1)), ]]
 
-    text = 'Parameteres for - ' + str(method_name)
+    text = f'Parameteres for - {str(method_name)}'
     layout = [[sg.Frame(text, parms, title_color='black', font='Any 12')],
               [sg.Submit(size=(15, 1), button_text="Generate JSON"), sg.Submit(size=(20, 1), button_text="Next"),
                sg.Cancel(size=(15, 1))]]
@@ -313,7 +311,7 @@ def main(JsonFilePath):
     for i in range(len(values)):
         library_name = values[i].split("_")[-1]
         library.append(library_name)
-        library_name = "_" + library_name
+        library_name = f"_{library_name}"
         method_name = values[i].replace(library_name, "")
         method.append(method_name)
     if disp:
@@ -321,10 +319,7 @@ def main(JsonFilePath):
         print("\n\n")
         print("########################### V3 - START ###########################")
     for i in range(len(values)):
-        if i == 0:
-            path = "Base.json"
-        else:
-            path = "Output.json"
+        path = "Base.json" if i == 0 else "Output.json"
         a, flag, jsonFile = loadParams(method[i], library[i], path)
         if flag:
             break

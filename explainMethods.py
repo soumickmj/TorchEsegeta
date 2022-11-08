@@ -19,21 +19,17 @@ class Explainability:
     self.model = model
 
   def inpTransformSetupLime(self,resize, centre_crop, mean_vec=None, std_vec=None):
-  	data_transform = transforms.Compose([
-  	        transforms.Resize(resize),
-  	        transforms.CenterCrop(centre_crop)
-  	])
-  	return data_transform
+    return transforms.Compose(
+        [transforms.Resize(resize),
+         transforms.CenterCrop(centre_crop)])
 
   def inpTransformSetup(self, resize, centre_crop, mean_vec, std_vec):
-    data_transform = transforms.Compose([
-      transforms.Resize(resize),
-      transforms.CenterCrop(centre_crop),
-      transforms.ToTensor(),
-      transforms.Normalize(mean=mean_vec,
-                           std=std_vec)
+    return transforms.Compose([
+        transforms.Resize(resize),
+        transforms.CenterCrop(centre_crop),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=mean_vec, std=std_vec),
     ])
-    return data_transform
 
 
   def lime_segmentation(self,forward_func, inp_image, inp_transform_flag,transform_func, device,
@@ -83,21 +79,25 @@ class Explainability:
                                                 num_features=num_features, hide_rest=True)
       img_boundry1 = mark_boundaries(temp / 255.0, mask)
       save_im = Image.fromarray((img_boundry1 * 255).astype(np.uint8))
-      save_im.save(output_path + "/" + input_file + '_lime_' + "_towards_prediction_class_" + str(target) + ".png",
-                 format='png')
+      save_im.save(
+          f"{output_path}/{input_file}_lime__towards_prediction_class_{str(target)}.png",
+          format='png',
+      )
 
       temp, mask = explanation.get_image_and_mask(target, positive_only=False,
                                                 num_features=num_features, hide_rest=False)
       img_boundry2 = mark_boundaries(temp / 255.0, mask)
       save_im = Image.fromarray((img_boundry2 * 255).astype(np.uint8))
-      save_im.save(output_path + "/" + input_file + '_lime_' + "_against_prediction_class_" + str(target) + ".png",
-                 format='png')
+      save_im.save(
+          f"{output_path}/{input_file}_lime__against_prediction_class_{str(target)}.png",
+          format='png',
+      )
     else:
       #print(target, type(target))
       if not batch_dim_present:
           inp_image = inp_image.unsqueeze(0)
-      if not os.path.exists(output_path + '/Lime_'+input_file):
-        os.mkdir(output_path + '/Lime_'+input_file)
+      if not os.path.exists(f'{output_path}/Lime_{input_file}'):
+        os.mkdir(f'{output_path}/Lime_{input_file}')
       while indx< depth:
         explanation = explainer.explain_instance(np.array(inp_image[0,0,indx].type(torch.DoubleTensor)),
                                              batch_func_3d,
@@ -108,8 +108,10 @@ class Explainability:
                                                     num_features=num_features, hide_rest=False)
         img_boundry1 = mark_boundaries(temp / 255.0, mask)
         save_im = Image.fromarray((img_boundry1 * 255).astype(np.uint8))
-        save_im.save(output_path + '/Lime_'+input_file +"/" + str(indx)+"_towards_prediction_class_" + str(target) + ".png",
-                     format='png')
+        save_im.save(
+            f'{output_path}/Lime_{input_file}/{indx}_towards_prediction_class_{str(target)}.png',
+            format='png',
+        )
 
         indx +=1
 

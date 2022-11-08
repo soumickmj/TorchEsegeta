@@ -31,7 +31,7 @@ def generate_smooth_grad(Backprop, prep_img, target_class, param_n, param_sigma_
 
     mean = 0
     sigma = param_sigma_multiplier / (torch.max(prep_img) - torch.min(prep_img)).item()
-    for x in range(param_n):
+    for _ in range(param_n):
         # Generate noise
         noise = Variable(prep_img.data.new(prep_img.size()).normal_(mean, sigma**2))
         # Add noise to the image
@@ -64,9 +64,12 @@ if __name__ == '__main__':
                                        param_sigma_multiplier)
 
     # Save colored gradients
-    save_gradient_images(smooth_grad, file_name_to_export + '_SmoothGrad_color')
+    save_gradient_images(smooth_grad, f'{file_name_to_export}_SmoothGrad_color')
     # Convert to grayscale
     grayscale_smooth_grad = convert_to_grayscale(smooth_grad)
     # Save grayscale gradients
-    save_gradient_images(grayscale_smooth_grad, file_name_to_export + '_SmoothGrad_gray')
+    save_gradient_images(
+        grayscale_smooth_grad, f'{file_name_to_export}_SmoothGrad_gray'
+    )
+
     print('Smooth grad completed')

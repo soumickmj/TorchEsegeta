@@ -45,19 +45,20 @@ class Pipeline:
         if type(jsonpath).__name__ == 'dict':
             self.config = jsonpath
         else:
-            f = open(self.jsonpath)
-            self.config = json.load(f)
-            f.close()
-
+            with open(self.jsonpath) as f:
+                self.config = json.load(f)
         log_folder_created = False
         if not os.path.exists('Log'):
             os.makedirs('Log', exist_ok = True)
             log_folder_created = True
 
 
-        self.logger = get_logger("TorchEsegeta_" + str(self.instance_id),
-                                 "Log/AppLog_thread_" + str(self.instance_id) + ".log",
-                                 getattr(logging, self.config['log_level'].upper(), None))
+        self.logger = get_logger(
+            f"TorchEsegeta_{str(self.instance_id)}",
+            f"Log/AppLog_thread_{str(self.instance_id)}.log",
+            getattr(logging, self.config['log_level'].upper(), None),
+        )
+
         if log_folder_created:
             self.logger.info("Log filepath created")
 
@@ -68,8 +69,10 @@ class Pipeline:
             except Exception:
                 self.logger.warn("Timeout funtionality only works for Linux")
 
-        if self.model is None or self.config["default"] == True:
-            if self.config["default"] and not self.config["is_3d"]:
+        if (self.model is None or self.config["default"] == True) and self.config[
+            "default"
+        ]:
+            if not self.config["is_3d"]:
                 if self.config['model_nature'] == 'Segmentation':
                     self.inp_path = 'testImage.jpg'
                     self.inp = Image.open(self.inp_path)
@@ -84,55 +87,54 @@ class Pipeline:
                     self.inp = Image.open(self.inp_path)
                     self.model.eval()
             else:
-                if self.config["default"] and self.config["is_3d"]:
-                    if self.config['model_nature'] == 'Classification':
-                        self.inp_path = 'BraTS19_2013_0_1_t1ce.nii.gz'
-                        self.inp = nb.load(self.inp_path)
-                        self.inp = self.inp.get_fdata()
-                        self.inp = self.inp.squeeze()
-                        if self.config["patch_size"] == -1:
-                            self.inp = zoom(self.inp, (0.5, 0.5, 0.5))
-                        #self.inp = (self.inp - np.min(self.inp)) / (np.max(self.inp) - np.min(self.inp))
-                        self.inp = np.moveaxis(self.inp, -1, 0)
-                        self.inp = torch.from_numpy(self.inp)
-                        self.inp = torch.unsqueeze(self.inp, 0).float()
-                        self.model = models.video.r3d_18(pretrained=True)
-                        #self.model.stem = R2Plus1dStem4MRI()
-                        self.model.stem = modifybasicstem()
-                        self.model.fc = nn.Sequential(
-                            nn.Dropout(0.3),
-                            nn.Linear(self.model.fc.in_features, 3)
-                        )
+                if self.config['model_nature'] == 'Classification':
+                    self.inp_path = 'BraTS19_2013_0_1_t1ce.nii.gz'
+                    self.inp = nb.load(self.inp_path)
+                    self.inp = self.inp.get_fdata()
+                    self.inp = self.inp.squeeze()
+                    if self.config["patch_size"] == -1:
+                        self.inp = zoom(self.inp, (0.5, 0.5, 0.5))
+                    #self.inp = (self.inp - np.min(self.inp)) / (np.max(self.inp) - np.min(self.inp))
+                    self.inp = np.moveaxis(self.inp, -1, 0)
+                    self.inp = torch.from_numpy(self.inp)
+                    self.inp = torch.unsqueeze(self.inp, 0).float()
+                    self.model = models.video.r3d_18(pretrained=True)
+                    #self.model.stem = R2Plus1dStem4MRI()
+                    self.model.stem = modifybasicstem()
+                    self.model.fc = nn.Sequential(
+                        nn.Dropout(0.3),
+                        nn.Linear(self.model.fc.in_features, 3)
+                    )
 
-                        ckpt = load_checkpoint('resnet3d.pth.tar')
-                        self.model.load_state_dict(ckpt['state_dict'])
-                        self.model.eval()
-                    if self.config['model_nature'] == 'Segmentation':
-                        self.inp_path = 'SegmentModel/data/SegTestVol.nii'
-                        # self.inp_path = 'SegmentModel/data/IXI425-IOP-0988-MRA.nii.gz'
-                        self.inp = nb.load(self.inp_path)
-                        self.inp = self.inp.get_fdata()
-                        self.inp = self.inp.squeeze()
-                        if self.config["patch_size"] == -1:
-                            # self.inp = zoom(self.inp, (0.125, 0.125, 0.35))
-                            self.inp = zoom(self.inp, (0.089, 0.101, 0.33))
-                        self.inp = (self.inp - np.min(self.inp)) / (np.max(self.inp) - np.min(self.inp))
-                        # print(self.inp.shape)
-                        # self.inp = self.inp.squeeze()
-                        self.inp = np.moveaxis(self.inp, -1, 0)
-                        # print(self.inp.shape)
-                        self.inp = np.moveaxis(self.inp, -1, -2)
-                        # print(self.inp.shape)
-                        self.inp = torch.from_numpy(self.inp)
-                        self.inp = torch.unsqueeze(self.inp, 0).float()
-                        # print(self.inp.shape)
-                        self.model = U_Net()
-                        ckpt = load_checkpoint('SegmentModel/checkpointbestUNet.pth')
-                        # ckpt = load_checkpoint('SegmentModel/checkpointbestUNetMSS_Deform.pth')
-                        # ckpt = load_checkpoint('SegmentModel/checkpointbest50UNetMSS.pth')
-                        self.model.load_state_dict(ckpt['state_dict'])
-                        self.model = SegmentWrapper(self.model)
-                        self.model.eval()
+                    ckpt = load_checkpoint('resnet3d.pth.tar')
+                    self.model.load_state_dict(ckpt['state_dict'])
+                    self.model.eval()
+                if self.config['model_nature'] == 'Segmentation':
+                    self.inp_path = 'SegmentModel/data/SegTestVol.nii'
+                    # self.inp_path = 'SegmentModel/data/IXI425-IOP-0988-MRA.nii.gz'
+                    self.inp = nb.load(self.inp_path)
+                    self.inp = self.inp.get_fdata()
+                    self.inp = self.inp.squeeze()
+                    if self.config["patch_size"] == -1:
+                        # self.inp = zoom(self.inp, (0.125, 0.125, 0.35))
+                        self.inp = zoom(self.inp, (0.089, 0.101, 0.33))
+                    self.inp = (self.inp - np.min(self.inp)) / (np.max(self.inp) - np.min(self.inp))
+                    # print(self.inp.shape)
+                    # self.inp = self.inp.squeeze()
+                    self.inp = np.moveaxis(self.inp, -1, 0)
+                    # print(self.inp.shape)
+                    self.inp = np.moveaxis(self.inp, -1, -2)
+                    # print(self.inp.shape)
+                    self.inp = torch.from_numpy(self.inp)
+                    self.inp = torch.unsqueeze(self.inp, 0).float()
+                    # print(self.inp.shape)
+                    self.model = U_Net()
+                    ckpt = load_checkpoint('SegmentModel/checkpointbestUNet.pth')
+                    # ckpt = load_checkpoint('SegmentModel/checkpointbestUNetMSS_Deform.pth')
+                    # ckpt = load_checkpoint('SegmentModel/checkpointbest50UNetMSS.pth')
+                    self.model.load_state_dict(ckpt['state_dict'])
+                    self.model = SegmentWrapper(self.model)
+                    self.model.eval()
                         # print("loaded")
 
     def handler(self, signum, frame):
@@ -175,7 +177,7 @@ class Pipeline:
 
 
         filePath = model_name if model_name is not None else self.config['model_name'] + '_' +\
-                    self.config['dataset'] + '_' + self.config['test_run']
+                        self.config['dataset'] + '_' + self.config['test_run']
         filePath = os.path.join(output_path if output_path is not None else self.config["output_path"],
                                 filePath)
         if not os.path.exists(filePath):

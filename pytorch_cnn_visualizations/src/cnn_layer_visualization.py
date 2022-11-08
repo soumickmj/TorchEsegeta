@@ -40,13 +40,14 @@ class CNNLayerVisualization():
         def hook_function(module, grad_in, grad_out):
             # Gets the conv output of the selected filter (from selected layer)
             self.conv_output = grad_out[0, self.selected_filter]
+
         # Hook the selected layer
         # Change by Arnab Das
         #for index, layer in (self.model._modules.items()):
         #    if index == self.selected_layer:
         #        layer[-1].register_forward_hook(hook_function)
 
-        eval("self.model." + self.selected_layer).register_forward_hook(hook_function)
+        eval(f"self.model.{self.selected_layer}").register_forward_hook(hook_function)
         #list(self.model._modules.items())[self.selected_layer][-1].register_forward_hook(hook_function)
         #self.model[self.selected_layer].register_forward_hook(hook_function)
 
@@ -89,17 +90,18 @@ class CNNLayerVisualization():
             # Update image
             optimizer.step()
             # Recreate image
-            if not is_3d: self.created_image = recreate_image(processed_image)
-            else: self.created_image = processed_image
-            # Save image
+            self.created_image = (
+                processed_image if is_3d else recreate_image(processed_image)
+            )
+
             if i % 30 == 0:
                 if is_3d == False:
-                    im_path = opPath + "Layer_Visualization_"+str(self.selected_layer) + \
-                    '_f' + str(self.selected_filter) + '_iter' + str(i) + '.png'
+                    im_path = f"{opPath}Layer_Visualization_{str(self.selected_layer)}_f{str(self.selected_filter)}_iter{str(i)}.png"
+
                     save_image(self.created_image, im_path)
                 else:
-                    im_path = opPath + "Layer_Visualization_"+str(self.selected_layer) + \
-                    '_f' + str(self.selected_filter) + '_iter' + str(i) + '.nii.gz'
+                    im_path = f"{opPath}Layer_Visualization_{str(self.selected_layer)}_f{str(self.selected_filter)}_iter{str(i)}.nii.gz"
+
                     grads = self.created_image.squeeze().cpu().detach().numpy()
                     if isDepthFirst:
                         grads = np.moveaxis(grads, 0, -1)
@@ -146,19 +148,18 @@ class CNNLayerVisualization():
             # Update image
             optimizer.step()
             # Recreate image
-            if not is_3d:
-                self.created_image = recreate_image(processed_image)
-            else:
-                self.created_image = processed_image
-            # Save image
+            self.created_image = (
+                processed_image if is_3d else recreate_image(processed_image)
+            )
+
             if i % 30 == 0:
                 if is_3d==False:
-                    im_path = opPath + "Layer_Visualization_no_hook_" + str(self.selected_layer) + \
-                    '_f' + str(self.selected_filter) + '_iter' + str(i) + '.png'
+                    im_path = f"{opPath}Layer_Visualization_no_hook_{str(self.selected_layer)}_f{str(self.selected_filter)}_iter{str(i)}.png"
+
                     save_image(self.created_image, im_path)
                 else:
-                    im_path = opPath + "Layer_Visualization_no_hook_" + str(self.selected_layer) + \
-                    '_f' + str(self.selected_filter) + '_iter' + str(i) + '.nii.gz'
+                    im_path = f"{opPath}Layer_Visualization_no_hook_{str(self.selected_layer)}_f{str(self.selected_filter)}_iter{str(i)}.nii.gz"
+
                     grads = self.created_image.squeeze().cpu().detach().numpy()
                     if isDepthFirst:
                         grads = np.moveaxis(grads, 0, -1)

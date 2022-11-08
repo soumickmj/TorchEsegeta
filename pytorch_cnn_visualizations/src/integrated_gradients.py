@@ -39,9 +39,7 @@ class IntegratedGradients():
     def generate_images_on_linear_path(self, input_image, steps):
         # Generate uniform numbers between 0 and steps
         step_list = np.arange(steps+1)/steps
-        # Generate scaled xbar images
-        xbar_list = [input_image*step for step in step_list]
-        return xbar_list
+        return [input_image*step for step in step_list]
 
     def generate_gradients(self, input_image, target_class, device):
         # Forward
@@ -53,10 +51,7 @@ class IntegratedGradients():
         one_hot_output[0][target_class] = 1
         # Backward pass
         model_output.backward(gradient=one_hot_output.to(device), retain_graph = True)
-        # Convert Pytorch variable to numpy array
-        # [0] to get rid of the first channel (1,3,224,224)
-        gradients_as_arr = self.gradients.data.cpu().numpy()[0]
-        return gradients_as_arr
+        return self.gradients.data.cpu().numpy()[0]
 
     def generate_integrated_gradients(self, input_image, target_class, steps, device):
         # Generate xbar images
@@ -84,5 +79,8 @@ if __name__ == '__main__':
     # Convert to grayscale
     grayscale_integrated_grads = convert_to_grayscale(integrated_grads)
     # Save grayscale gradients
-    save_gradient_images(grayscale_integrated_grads, file_name_to_export + '_Integrated_G_gray')
+    save_gradient_images(
+        grayscale_integrated_grads, f'{file_name_to_export}_Integrated_G_gray'
+    )
+
     print('Integrated gradients completed.')

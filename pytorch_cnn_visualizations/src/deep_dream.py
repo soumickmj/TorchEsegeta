@@ -58,7 +58,7 @@ class DeepDream():
         #    if index == self.selected_layer:
         #        layer[-1].register_forward_hook(hook_function)
 
-        eval("self.model." + self.selected_layer).register_forward_hook(hook_function)
+        eval(f"self.model.{self.selected_layer}").register_forward_hook(hook_function)
         #list(self.model._modules.items())[self.selected_layer][-1].register_forward_hook(hook_function)
         #self.model[self.selected_layer].register_forward_hook(hook_function)
 
@@ -107,12 +107,12 @@ class DeepDream():
                 #print(self.created_image.shape)
                 if is_3d== False:
 
-                    im_path = self.im_path +"CNN_Vis_DeepDream_" + str(self.selected_layer) + \
-                    '_f' + str(self.selected_filter) + '_iter' + str(i) + '.png'
+                    im_path = f"{self.im_path}CNN_Vis_DeepDream_{str(self.selected_layer)}_f{str(self.selected_filter)}_iter{str(i)}.png"
+
                     save_image(self.created_image, im_path)
                 else:
-                    im_path = self.im_path +"CNN_Vis_DeepDream_" + str(self.selected_layer) + \
-                    '_f' + str(self.selected_filter) + '_iter' + str(i) + '.nii.gz'
+                    im_path = f"{self.im_path}CNN_Vis_DeepDream_{str(self.selected_layer)}_f{str(self.selected_filter)}_iter{str(i)}.nii.gz"
+
                     grads = self.created_image.squeeze().cpu().detach().numpy()
                     if is_depth_first:
                         grads= np.moveaxis(grads, 0, -1)
